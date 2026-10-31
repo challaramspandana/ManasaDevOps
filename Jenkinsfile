@@ -1,40 +1,43 @@
+
 pipeline {
     agent any
 
     stages {
-        stage('Install Dependencies and Run Selenium Tests') {
+
+        stage('Run Selenium Tests with pytest') {
             steps {
+                echo "Running Selenium Tests using pytest"
+
                 bat 'pip install -r requirements.txt'
+
                 bat 'start /B python app.py'
-                bat 'ping 127.0.0.1 -n 6 > nul'
+
+                bat 'ping 127.0.0.1 -n 5 > nul'
+
                 bat 'python -m pytest -v'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t digital-notice-board:v1 .'
+                echo "Build Docker Image"
+                bat "docker build -t pet-adoption-platform:v1 ."
             }
         }
 
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-credentials',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_TOKEN'
-                )]) {
-                    bat 'echo %DOCKER_TOKEN% | docker login -u %DOCKER_USER% --password-stdin'
-                }
+                bat 'docker login -u YOUR_DOCKERHUB_USERNAME'
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Push Docker Image to Docker Hub') {
             steps {
-                bat 'docker tag digital-notice-board:v1 spandana234/digital-notice-board:latest'
-                retry(3) {
-                    bat 'docker push spandana234/digital-notice-board:latest'
-                }
+                echo "Push Docker Image to Docker Hub"
+
+                bat "docker tag pet-adoption-platform:v1 YOUR_DOCKERHUB_USERNAME/pet-adoption-platform:latest"
+
+                bat "docker push YOUR_DOCKERHUB_USERNAME/pet-adoption-platform:latest"
             }
         }
 
@@ -42,13 +45,17 @@ pipeline {
             steps {
                 bat 'kubectl apply -f deployment.yaml --validate=false'
                 bat 'kubectl apply -f service.yaml'
-                bat 'kubectl rollout status deployment/digital-notice-board --timeout=180s'
             }
         }
     }
 
     post {
-        success { echo 'Digital Notice Board pipeline completed successfully!' }
-        failure { echo 'Pipeline failed. Please check the console output.' }
+        success {
+            echo 'Pet Adoption Platform Pipeline completed successfully!'
+        }
+
+        failure {
+            echo 'Pipeline failed. Please check the logs.'
+        }
     }
 }
