@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusConnect | Digital Notice Board</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header class="header">
+  <a class="brand" href="/"><span class="logo">CC</span><span><b>CampusConnect</b><small>Digital Notice Board</small></span></a>
+  <a class="publish-link" href="#publish">Publish a notice</a>
+</header>
+<main class="container">
+<section class="hero">
+  <div><span class="eyebrow">CAMPUS UPDATES</span><h1>Everything important,<br><em>all in one place.</em></h1>
+  <p>Stay informed about events, academics, placements and campus announcements.</p></div>
+  <div class="hero-art"><div class="sheet"><b>NOTICE</b><i></i><i></i><i></i></div></div>
+</section>
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}
+{% endwith %}
+<section class="notices">
+  <div class="section-title"><div><span class="eyebrow">LATEST ANNOUNCEMENTS</span><h2>Notice board</h2></div><span>{{ notices|length }} notice(s)</span></div>
+  <form class="filters" method="GET">
+    <input name="search" type="search" placeholder="Search notices..." value="{{ search }}">
+    <select name="category" aria-label="Filter by category">
+      <option value="">All categories</option>
+      {% for item in ["General","Events","Academics","Placements","Examinations","Sports"] %}
+      <option value="{{ item }}" {% if selected_category == item %}selected{% endif %}>{{ item }}</option>
+      {% endfor %}
+    </select>
+    <button class="button dark" type="submit">Search</button><a href="/">Clear</a>
+  </form>
+  <div class="notice-grid">
+  {% for notice in notices %}
+    <article class="notice-card">
+      <div class="card-meta"><span class="tag">{{ notice.category }}</span><small>{{ notice.posted_on }}</small></div>
+      <h3>{{ notice.title }}</h3><p>{{ notice.content }}</p>
+      <div class="posted">Posted by <b>{{ notice.published_by }}</b></div>
+      {% if notice.expiry_date %}<small>Expires: {{ notice.expiry_date }}</small>{% endif %}
+      <form method="POST" action="{{ url_for('delete_notice', notice_id=notice.id) }}" onsubmit="return confirm('Delete this notice?')">
+        <button class="delete" type="submit">Delete notice</button>
+      </form>
+    </article>
+  {% else %}<div class="empty"><h3>No notices found</h3><p>Try another search or publish a notice.</p></div>{% endfor %}
+  </div>
+</section>
+<section class="publish" id="publish">
+  <div><span class="eyebrow">SHARE AN UPDATE</span><h2>Publish a notice</h2><p>Keep students and staff updated with important campus information.</p></div>
+  <form id="notice-form" class="notice-form" method="POST" action="/add-notice">
+    <div class="form-row">
+      <label>Notice title<input name="title" placeholder="Enter notice title" required></label>
+      <label>Category<select name="category" required><option value="">Select category</option><option>General</option><option>Events</option><option>Academics</option><option>Placements</option><option>Examinations</option><option>Sports</option></select></label>
+    </div>
+    <label>Notice description<textarea name="content" rows="4" placeholder="Write the announcement..." required></textarea></label>
+    <div class="form-row">
+      <label>Published by<input name="published_by" placeholder="Department / Faculty name" required></label>
+      <label>Expiry date (optional)<input name="expiry_date" type="date"></label>
+    </div>
+    <button class="button primary" type="submit">Publish notice</button>
+  </form>
+</section>
+</main>
+<footer><b>CampusConnect · Digital Notice Board</b><span>One campus. One place for every update.</span></footer>
+</body></html>

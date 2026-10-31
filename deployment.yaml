@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: digital-notice-board
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: digital-notice-board
+  template:
+    metadata:
+      labels:
+        app: digital-notice-board
+    spec:
+      containers:
+        - name: digital-notice-board
+          image: spandana234/digital-notice-board:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
