@@ -27,7 +27,7 @@ pipeline {
 
         stage('Docker Login') {
             steps {
-                bat 'docker login -u YOUR_DOCKERHUB_USERNAME'
+                bat 'docker login -u spandana234 -p Spandana@23'
             }
         }
 
@@ -35,9 +35,9 @@ pipeline {
             steps {
                 echo "Push Docker Image to Docker Hub"
 
-                bat "docker tag pet-adoption-platform:v1 YOUR_DOCKERHUB_USERNAME/pet-adoption-platform:latest"
+                bat "docker tag pet-adoption-platform:v1 spandana234/pet-adoption-platform:latest"
 
-                bat "docker push YOUR_DOCKERHUB_USERNAME/pet-adoption-platform:latest"
+                bat "docker push spandana234/pet-adoption-platform:latest"
             }
         }
 
