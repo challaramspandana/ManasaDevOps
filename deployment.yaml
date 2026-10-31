@@ -1,27 +1,33 @@
+
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
-  name: digital-notice-board
+  name: pet-adoption-platform
+
 spec:
-  replicas: 2
+  replicas: 1
+
   selector:
     matchLabels:
-      app: digital-notice-board
+      app: pet-adoption-platform
+
   template:
     metadata:
       labels:
-        app: digital-notice-board
+        app: pet-adoption-platform
+
     spec:
       containers:
-        - name: digital-notice-board
-          image: spandana234/digital-notice-board:latest
-          imagePullPolicy: Always
+        - name: pet-adoption-platform
+          image: YOUR_DOCKERHUB_USERNAME/pet-adoption-platform:latest
+
           ports:
             - containerPort: 5000
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "500m"
-              memory: "256Mi"
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
